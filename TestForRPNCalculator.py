@@ -11,6 +11,10 @@ class TestCalculator(unittest.TestCase):
         rpn = RPNCalculator()
         self.assertEqual(rpn.execute("1   2   3   my_var"), [1, 2, 3, "my_var"])
 
+    def testStack_ExcessSpacesAndNewLines(self):
+        rpn = RPNCalculator()
+        self.assertEqual(rpn.execute("""1   2  \n 3  \nmy_var"""), [1, 2, 3, "my_var"])
+
     def testStack_IntFloatAndVar(self):
         rpn = RPNCalculator()
         self.assertEqual(rpn.execute("1 2.0 3 my_var"), [1, 2.0, 3, "my_var"])
@@ -23,13 +27,9 @@ class TestCalculator(unittest.TestCase):
         rpn = RPNCalculator()
         self.assertEqual(rpn.execute("my_var"), ["my_var"])
 
-    def testStack_IntAndVar(self):
+    def testStack_FloatWithCommasAndDecPoint(self):
         rpn = RPNCalculator()
-        self.assertEqual(rpn.execute("1 2 3 my_var"), [1, 2, 3, "my_var"])
-
-    def testStack_IntAndVar(self):
-        rpn = RPNCalculator()
-        self.assertEqual(rpn.execute("1 2 3 my_var"), [1, 2, 3, "my_var"])
+        self.assertEqual(rpn.execute("1,2 2.3 3,1 "), [1.2, 2.3, 3.1])
 
 
 
