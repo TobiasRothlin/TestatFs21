@@ -83,7 +83,7 @@ class TestCalculator(unittest.TestCase):
         rpn = RPNCalculator()
         res = rpn.execute("1 2 3 4 +")
         print("Result: ", res)
-        self.assertEqual(res, [1,2,7])
+        self.assertEqual(res, [1, 2, 7])
 
     def testFunction_Add(self):
         rpn = RPNCalculator()
@@ -362,9 +362,50 @@ class TestCalculator(unittest.TestCase):
         rpn = RPNCalculator()
         self.assertRaises(TypeError, rpn.execute, *{'2 pow'})
 
-    def testException_TooFewArgumentsSingle(self):
+    def testException_TooFewArgumentsSingleOperations(self):
         rpn = RPNCalculator()
         self.assertRaises(TypeError, rpn.execute, *{'abs'})
+
+    def testException_WrongArgumentsSingleOperations(self):
+        rpn = RPNCalculator()
+        self.assertRaises(TypeError, rpn.execute, *{'hallo abs'})
+
+    def testException_SingleWrongArgumentsDualOperations(self):
+        rpn = RPNCalculator()
+        self.assertRaises(TypeError, rpn.execute, *{'2 hello pow'})
+
+    def testException_WrongArgumentsDualOperations(self):
+        rpn = RPNCalculator()
+        self.assertRaises(TypeError, rpn.execute, *{'hello1 hello2 pow'})
+
+    # End exception handling test
+    # --------------------------
+    # Testing functionality accessing variables
+    # --------------------------
+
+    def testVarOps_AccessingVarDualOperation1(self):
+        rpn = RPNCalculator()
+        res = rpn.execute("1 2 3 my_var +", DebugComponents.addVariable)
+        print("Result: ", res)
+        self.assertEqual(res, [1, 2, 12])
+
+    def testVarOps_AccessingVarDualOperation(self):
+        rpn = RPNCalculator()
+        res = rpn.execute("1 2 my_var 3 +", DebugComponents.addVariable)
+        print("Result: ", res)
+        self.assertEqual(res, [1, 2, 12])
+
+    def testVarOps_AccessingVarSingleOperation(self):
+        rpn = RPNCalculator()
+        res = rpn.execute("1 2 my_var sqrt", DebugComponents.addVariable)
+        print("Result: ", res)
+        self.assertEqual(res, [1, 2, 3])
+
+    def testVarOps_StoringVar(self):
+        rpn = RPNCalculator()
+        res = rpn.execute("1 2 10 20 y store x store")
+        print("Result: ", rpn.variables)
+        self.assertEqual(rpn.variables, {"y": 20, "x": 10})
 
 
 if __name__ == '__main__':

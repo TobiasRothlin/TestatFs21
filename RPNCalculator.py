@@ -10,6 +10,7 @@ class DebugComponents(Enum):
     stackBuild = 1  # RPNCalculator.execute() returns the current stack
     variableBuild = 2  # RPNCalculator.execute() returns the current variables
     functionToExecuteBuild = 3  # RPNCalculator.execute() returns the current functionsToExecute
+    addVariable = 4  # Adds the variable 'my_var' to .variables{} with the value 9
 
 
 #                                 (should now always be an empty list)
@@ -74,7 +75,8 @@ class RPNCalculator:
                     '>': RPNCalculator.__greaterthan,
                     '<=': RPNCalculator.__lessequalthan,
                     '<': RPNCalculator.__lessthan,
-                    'pow': math.pow
+                    'pow': math.pow,
+
                 },
             'singleOperators':
                 {
@@ -92,20 +94,19 @@ class RPNCalculator:
                     'sqrt': math.sqrt,
                     'floor': math.floor,
                     'ceil': math.ceil,
-                    'round': round
-
+                    'round': round,
+                    'store': self.__store
                 }
         }
 
     def execute(self, str, debug=DebugComponents.noDebugging):
+        if debug == DebugComponents.addVariable:
+            self.variables.update({'my_var': 9})
         newValues = self.__getinputvalues(str)
         self.stack.extend(newValues[0])
         self.__functionToExecute.extend(newValues[1])
         if debug == DebugComponents.stackBuild:
             return self.stack
-
-        elif debug == DebugComponents.variableBuild:
-            return self.variables
 
         elif debug == DebugComponents.functionToExecuteBuild:
             return self.__functionToExecute
@@ -117,17 +118,53 @@ class RPNCalculator:
 
     def __doNextCalculation(self):
         if self.__functionToExecute[0] in self.__functionNames['dualOperators'].keys():
+
             if len(self.stack) < 2:
-                raise TypeError(self.__functionToExecute[0] + "got too few arguments")
+                print(self.__functionToExecute[0] + " got too few arguments")
+                raise TypeError(self.__functionToExecute[0] + " got too few arguments")
+
+            if isinstance(self.stack[-2], str):
+                if self.stack[-2] in self.variables.keys():
+                    print("loading Variable: " + self.stack[-2] + "-> "  + str(self.variables[self.stack[-2]]))
+                    self.stack[-2] = self.variables[self.stack[-2]]
+                else:
+                    print(
+                        self.__functionToExecute[0] + " got invalid arguments " + str(self.stack[-2]) + " " + str(self.stack[-1]))
+                    raise TypeError(
+                        self.__functionToExecute[0] + " got invalid arguments " + str(self.stack[-2]) + " " + str(self.stack[-1]))
+
+            elif isinstance(self.stack[-1], str):
+                if self.stack[-1] in self.variables.keys():
+                    print("loading Variable: " + self.stack[-1] + "-> " + str(self.variables[self.stack[-1]]))
+                    self.stack[-1] = self.variables[self.stack[-1]]
+                else:
+                    print(
+                        self.__functionToExecute[0] + " got invalid arguments " + str(self.stack[-2]) + " " + str(self.stack[-1]))
+                    raise TypeError(
+                        self.__functionToExecute[0] + " got invalid arguments " + str(self.stack[-2]) + " " + str(self.stack[-1]))
+
             result = self.__functionNames['dualOperators'][self.__functionToExecute[0]](self.stack[-2], self.stack[-1])
             self.stack.remove(self.stack[-1])
+
         elif self.__functionToExecute[0] in self.__functionNames['singleOperators'].keys():
             if len(self.stack) < 1:
-                raise TypeError(self.__functionToExecute[0] + "got too few arguments")
+                print(self.__functionToExecute[0] + " got too few arguments")
+                raise TypeError(self.__functionToExecute[0] + " got too few arguments")
+
+            if isinstance(self.stack[-1], str):
+                if self.stack[-1] in self.variables.keys():
+                    print("loading Variable: " + self.stack[-1] + "-> " + str(self.variables[self.stack[-1]]))
+                    self.stack[-1] = self.variables[self.stack[-1]]
+                else:
+                    print(self.__functionToExecute[0] + " got invalid arguments " + str(self.stack[-1]))
+                    raise TypeError(self.__functionToExecute[0] + " got invalid arguments " + str(self.stack[-1]))
+
             result = self.__functionNames['singleOperators'][self.__functionToExecute[0]](self.stack[-1])
+
         else:
             print("Function Not Found!!!!!!")
             raise KeyError("Function not found")
+
         self.__functionToExecute.remove(self.__functionToExecute[0])
         self.stack.remove(self.stack[-1])
         print("Calculating:")
@@ -150,6 +187,7 @@ class RPNCalculator:
                     stacklist.append(int(cleanstring))
                 else:
                     if cleanstring[0].isdigit():
+                        print('invalid variable name ' + cleanstring)
                         raise SyntaxError('invalid variable name ' + cleanstring)
                     elif cleanstring in self.__functionNames['dualOperators'].keys() or cleanstring in \
                             self.__functionNames['singleOperators'].keys():
@@ -163,6 +201,17 @@ class RPNCalculator:
     # --------------------------
     # Calculation Functions
     # --------------------------
+
+    def __store(self, key):
+        indexInStack = len(self.stack)-1
+        firstValFound = None
+        while firstValFound is not None:
+            if not isinstance(self.stack[indexInStack], str):
+                firstValFound = self.stack[indexInStack]
+            else:
+                indexInStack -= 1
+        self.variables.update({key : firstValFound})
+        return key
 
     @staticmethod
     def __add(val1, val2):
