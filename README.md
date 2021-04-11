@@ -20,6 +20,6 @@
            static method:      all calculation methods
            static attribute:   .__const{}              ->  contains all constance the class knows key: constance name <string> | value constance value <float>
 
-### TEST Statistic
+### Test Statistic
     All 87 tests passsed.
     100% lines covered
