@@ -21,4 +21,5 @@
            static attribute:   .__const{}              ->  contains all constance the class knows key: constance name <string> | value constance value <float>
 
 ###TEST Statistic
-![Invoice Modul](Test Results - Unittests_for_TestForRPNCalculator_TestCalculator.html)
+    All 87 tests passsed.
+    100% lines covered
