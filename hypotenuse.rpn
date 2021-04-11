@@ -1,0 +1,4 @@
+# hypotenuse(a, b)
+# Return: sqrt(a^2 + b^2)
+dup * swap
+dup * + sqrt
