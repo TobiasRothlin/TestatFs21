@@ -10,11 +10,11 @@ class DebugComponents(Enum):
     stackBuild = 1  # RPNCalculator.execute() returns the current stack
     variableBuild = 2  # RPNCalculator.execute() returns the current variables
     functionToExecuteBuild = 3  # RPNCalculator.execute() returns the current
-#                                 functionsToExecute
+    #                                 functionsToExecute
     addVariable = 4  # Adds the variable 'my_var' to .variables{}
+
+
 #                      with the value 9
-
-
 #                                 (should now always be an empty list)
 # --------------------------
 # Main class RPNCalculator
@@ -165,7 +165,7 @@ class RPNCalculator:
             return self.__function_to_execute
 
         while len(self.__function_to_execute) > 0:
-            res = self.__do_next_calculation()
+            res = self.__do_next_calculation
             if res is not None:
                 self.stack.append(res)
 
@@ -177,8 +177,10 @@ class RPNCalculator:
             if not line[0] == '#':
                 print("Executing next line file: ", line)
                 self.execute(line)
+        file.close()
         return self.stack
 
+    @property
     def __do_next_calculation(self):
         result = None
         if self.__function_to_execute[0] in \
@@ -307,7 +309,7 @@ class RPNCalculator:
         return print_string
 
     # --------------------------
-    # Calculation Functions
+    # Stack Operations
     # --------------------------
 
     def __store(self):
@@ -318,6 +320,8 @@ class RPNCalculator:
                 first_number_in_stack = self.stack[current_index_in_stack]
             else:
                 current_index_in_stack -= 1
+                if len(self.stack)+current_index_in_stack < 0:
+                    raise TypeError("No number in stack to store")
         self.variables.update(
             {self.stack[current_index_in_stack + 1]: first_number_in_stack})
         self.stack.remove(self.stack[current_index_in_stack])
@@ -338,29 +342,68 @@ class RPNCalculator:
         return
 
     def __drop(self):
-        self.stack.remove(self.stack[-1])
+        if len(self.stack) > 0:
+            self.stack.remove(self.stack[-1])
         return
 
     def __dup(self):
-        self.stack.append(self.stack[-1])
+        if len(self.stack) > 0:
+            self.stack.append(self.stack[-1])
         return
 
     def __swap(self):
-        temp = self.stack[-1]
-        self.stack[-1] = self.stack[-2]
-        self.stack[-2] = temp
+        if len(self.stack) > 0:
+            if len(self.stack) > 1:
+                temp = self.stack[-1]
+                self.stack[-1] = self.stack[-2]
+                self.stack[-2] = temp
+            else:
+                return
+        else:
+            print(
+                "the swap command needs 2 or more elements on the stack "
+                "currently only " + str(
+                    len(self.stack)) + " elements on the stack")
+            raise TypeError(
+                "the swap command needs 2 or more elements on the stack "
+                "currently only " + str(
+                    len(self.stack)) + " elements on the stack")
         return
 
     def __over(self):
-        self.stack.append(self.stack[-2])
+        if len(self.stack) > 1:
+            self.stack.append(self.stack[-2])
+        else:
+            print(
+                "the over command needs 2 or more elements on the stack "
+                "currently only " + str(
+                    len(self.stack)) + " elements on the stack")
+            raise TypeError(
+                "the over command needs 2 or more elements on the stack "
+                "currently only " + str(
+                    len(self.stack)) + " elements on the stack")
         return
 
     def __rot(self):
-        temp = self.stack[-3]
-        self.stack[-3] = self.stack[-2]
-        self.stack[-2] = self.stack[-1]
-        self.stack[-1] = temp
+        if len(self.stack) > 2:
+            temp = self.stack[-3]
+            self.stack[-3] = self.stack[-2]
+            self.stack[-2] = self.stack[-1]
+            self.stack[-1] = temp
+        else:
+            print(
+                "the rot command needs 3 or more elements on the stack "
+                "currently only " + str(
+                    len(self.stack)) + " elements on the stack")
+            raise TypeError(
+                "the rot command needs 3 or more elements on the stack "
+                "currently only " + str(
+                    len(self.stack)) + " elements on the stack")
         return
+
+    # --------------------------
+    # Calculation Functions
+    # --------------------------
 
     @staticmethod
     def __add(val1, val2):

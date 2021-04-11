@@ -1,8 +1,7 @@
 import unittest
 from RPNCalculator import RPNCalculator
 from RPNCalculator import DebugComponents
-import io
-import sys
+
 
 class TestCalculator(unittest.TestCase):
 
@@ -12,37 +11,44 @@ class TestCalculator(unittest.TestCase):
 
     def testStack_IntAndVar(self):
         rpn = RPNCalculator()
-        print("Result: ", rpn.execute("1 2 3 my_var", DebugComponents.stackBuild))
+        print("Result: ",
+              rpn.execute("1 2 3 my_var", DebugComponents.stackBuild))
         self.assertEqual(rpn.stack, [1, 2, 3, "my_var"])
 
     def testStack_IntNegNumbers(self):
         rpn = RPNCalculator()
-        print("Result: ", rpn.execute("-1 -2 -3 my_var", DebugComponents.stackBuild))
+        print("Result: ",
+              rpn.execute("-1 -2 -3 my_var", DebugComponents.stackBuild))
         self.assertEqual(rpn.stack, [-1, -2, -3, "my_var"])
 
     def testStack_FloatNegNumbers(self):
         rpn = RPNCalculator()
-        print("Result: ", rpn.execute("-1.5 -2,1 -3.6 my_var", DebugComponents.stackBuild))
+        print("Result: ",
+              rpn.execute("-1.5 -2,1 -3.6 my_var", DebugComponents.stackBuild))
         self.assertEqual(rpn.stack, [-1.5, -2.1, -3.6, "my_var"])
 
     def testStack_ExcessSpaces(self):
         rpn = RPNCalculator()
-        print("Result: ", rpn.execute("1   2   3   my_var", DebugComponents.stackBuild))
+        print("Result: ",
+              rpn.execute("1   2   3   my_var", DebugComponents.stackBuild))
         self.assertEqual(rpn.stack, [1, 2, 3, "my_var"])
 
     def testStack_ExcessSpacesAndNewLines(self):
         rpn = RPNCalculator()
-        print("Result: ", rpn.execute("""1   2  \n 3  \nmy_var""", DebugComponents.stackBuild))
+        print("Result: ", rpn.execute("""1   2  \n 3  \nmy_var""",
+                                      DebugComponents.stackBuild))
         self.assertEqual(rpn.stack, [1, 2, 3, "my_var"])
 
     def testStack_IntFloatAndVar(self):
         rpn = RPNCalculator()
-        print("Result: ", rpn.execute("1 2.0 3 my_var", DebugComponents.stackBuild))
+        print("Result: ",
+              rpn.execute("1 2.0 3 my_var", DebugComponents.stackBuild))
         self.assertEqual(rpn.stack, [1, 2.0, 3, "my_var"])
 
     def testStack_Int(self):
         rpn = RPNCalculator()
-        print("Result: ", rpn.execute("1000 123412 12412311234123 13 14 13", DebugComponents.stackBuild))
+        print("Result: ", rpn.execute("1000 123412 12412311234123 13 14 13",
+                                      DebugComponents.stackBuild))
         self.assertEqual(rpn.stack, [1000, 123412, 12412311234123, 13, 14, 13])
 
     def testStack_Var(self):
@@ -52,22 +58,27 @@ class TestCalculator(unittest.TestCase):
 
     def testStack_FloatWithCommasAndDecPoint(self):
         rpn = RPNCalculator()
-        print("Result: ", rpn.execute("1,2 2.3 3,1 ", DebugComponents.stackBuild))
+        print("Result: ",
+              rpn.execute("1,2 2.3 3,1 ", DebugComponents.stackBuild))
         self.assertEqual(rpn.stack, [1.2, 2.3, 3.1])
 
     def testStack_ExcessNewLines(self):
         rpn = RPNCalculator()
-        print("Result: ", rpn.execute("1\n2\n\n\n4\n", DebugComponents.stackBuild))
+        print("Result: ",
+              rpn.execute("1\n2\n\n\n4\n", DebugComponents.stackBuild))
         self.assertEqual(rpn.stack, [1, 2, 4])
 
     def testStack_InvalidVarName(self):
         rpn = RPNCalculator()
-        self.assertRaises(SyntaxError, rpn.execute, *{'1 2 3 5my_var': DebugComponents.stackBuild})
+        self.assertRaises(SyntaxError, rpn.execute,
+                          *{'1 2 3 5my_var': DebugComponents.stackBuild})
 
     def testStack_constInput(self):
         rpn = RPNCalculator()
-        print("Result: ", rpn.execute("1 2 5 pi e ", DebugComponents.stackBuild))
-        self.assertEqual(rpn.stack, [1, 2, 5, 3.141592653589793, 2.718281828159045])
+        print("Result: ",
+              rpn.execute("1 2 5 pi e ", DebugComponents.stackBuild))
+        self.assertEqual(rpn.stack,
+                         [1, 2, 5, 3.141592653589793, 2.718281828159045])
 
     # End stack test
     # --------------------------
@@ -357,7 +368,8 @@ class TestCalculator(unittest.TestCase):
 
     def testException_InvalidVarName(self):
         rpn = RPNCalculator()
-        self.assertRaises(SyntaxError, rpn.execute, *{'1 2 3 5my_var': DebugComponents.stackBuild})
+        self.assertRaises(SyntaxError, rpn.execute,
+                          *{'1 2 3 5my_var': DebugComponents.stackBuild})
 
     def testException_TooFewArgumentsDualOperations(self):
         rpn = RPNCalculator()
@@ -413,21 +425,34 @@ class TestCalculator(unittest.TestCase):
         print("Result: ", rpn.variables)
         self.assertEqual(rpn.variables, {"y": 20, "x": 10})
 
+    def testVarOps_StoringVarNotDefined(self):
+        rpn = RPNCalculator()
+        rpn.execute("", DebugComponents.addVariable)
+        self.assertRaises(TypeError, rpn.execute, *{"y store"})
+
     def testVarOps_LoadingVar(self):
         rpn = RPNCalculator()
         res = rpn.execute("my_var load", DebugComponents.addVariable)
         print("Result: ", res)
         self.assertEqual(res, [9])
 
-    def testVarOps_LoadingNotDefinedVar(self):
+    def testVarOps_LoadingVarNotDefined(self):
         rpn = RPNCalculator()
-        rpn.execute("",DebugComponents.addVariable)
+        rpn.execute("", DebugComponents.addVariable)
         self.assertRaises(NameError, rpn.execute, *{"speed load"})
 
     def testStackOps_ClearStack(self):
         rpn = RPNCalculator()
         res = rpn.execute("1 2 3 4 5")
         self.assertEqual(rpn.stack, [1, 2, 3, 4, 5])
+        rpn.execute("clear")
+        print("Result: ", rpn.stack)
+        self.assertEqual(rpn.stack, [])
+
+    def testStackOps_ClearStackEmpty(self):
+        rpn = RPNCalculator()
+        res = rpn.execute("")
+        self.assertEqual(rpn.stack, [])
         rpn.execute("clear")
         print("Result: ", rpn.stack)
         self.assertEqual(rpn.stack, [])
@@ -440,6 +465,20 @@ class TestCalculator(unittest.TestCase):
         print("Result: ", rpn.stack)
         self.assertEqual(rpn.stack, [1, 2, 3, 5, 4])
 
+    def testStackOps_SwapStackOneValueInStack(self):
+        rpn = RPNCalculator()
+        res = rpn.execute("5")
+        self.assertEqual(rpn.stack, [5])
+        rpn.execute("swap")
+        print("Result: ", rpn.stack)
+        self.assertEqual(rpn.stack, [5])
+
+    def testStackOps_SwapStackNoneValueInStack(self):
+        rpn = RPNCalculator()
+        res = rpn.execute("")
+        self.assertEqual(rpn.stack, [])
+        self.assertRaises(TypeError, rpn.execute, *{"swap"})
+
     def testStackOps_DropStack(self):
         rpn = RPNCalculator()
         res = rpn.execute("1 2 3 4 5")
@@ -447,6 +486,14 @@ class TestCalculator(unittest.TestCase):
         rpn.execute("drop")
         print("Result: ", rpn.stack)
         self.assertEqual(rpn.stack, [1, 2, 3, 4])
+
+    def testStackOps_DropStackNoneValuesInStack(self):
+        rpn = RPNCalculator()
+        res = rpn.execute("")
+        self.assertEqual(rpn.stack, [])
+        rpn.execute("drop")
+        print("Result: ", rpn.stack)
+        self.assertEqual(rpn.stack, [])
 
     def testStackOps_DupStack(self):
         rpn = RPNCalculator()
@@ -456,6 +503,14 @@ class TestCalculator(unittest.TestCase):
         print("Result: ", rpn.stack)
         self.assertEqual(rpn.stack, [1, 2, 3, 4, 5, 5])
 
+    def testStackOps_DupStackNoneValuesInStack(self):
+        rpn = RPNCalculator()
+        res = rpn.execute("")
+        self.assertEqual(rpn.stack, [])
+        rpn.execute("dup")
+        print("Result: ", rpn.stack)
+        self.assertEqual(rpn.stack, [])
+
     def testStackOps_OverStack(self):
         rpn = RPNCalculator()
         res = rpn.execute("1 2 3 4 5")
@@ -463,6 +518,18 @@ class TestCalculator(unittest.TestCase):
         rpn.execute("over")
         print("Result: ", rpn.stack)
         self.assertEqual(rpn.stack, [1, 2, 3, 4, 5, 4])
+
+    def testStackOps_OverStackOneValueInStack(self):
+        rpn = RPNCalculator()
+        res = rpn.execute("5")
+        self.assertEqual(rpn.stack, [5])
+        self.assertRaises(TypeError, rpn.execute, *{"over"})
+
+    def testStackOps_OverStackNoneValuesInStack(self):
+        rpn = RPNCalculator()
+        res = rpn.execute("")
+        self.assertEqual(rpn.stack, [])
+        self.assertRaises(TypeError, rpn.execute, *{"over"})
 
     def testStackOps_RotStack(self):
         rpn = RPNCalculator()
@@ -472,9 +539,27 @@ class TestCalculator(unittest.TestCase):
         print("Result: ", rpn.stack)
         self.assertEqual(rpn.stack, [1, 2, 4, 5, 3])
 
+    def testStackOps_RotStackNoneValueInStack(self):
+        rpn = RPNCalculator()
+        res = rpn.execute("")
+        self.assertEqual(rpn.stack, [])
+        self.assertRaises(TypeError, rpn.execute, *{"rot"})
+
+    def testStackOps_RotStackOneValueInStack(self):
+        rpn = RPNCalculator()
+        res = rpn.execute("2")
+        self.assertEqual(rpn.stack, [2])
+        self.assertRaises(TypeError, rpn.execute, *{"rot"})
+
+    def testStackOps_RotStackTwoValueInStack(self):
+        rpn = RPNCalculator()
+        res = rpn.execute("2 4")
+        self.assertEqual(rpn.stack, [2, 4])
+        self.assertRaises(TypeError, rpn.execute, *{"rot"})
+
     # End stack manipulations test
     # --------------------------
-    # Testing functionality runfile
+    # Testing functionality run_file
     # --------------------------
 
     def testRunfile_testHypoFile(self):
@@ -494,6 +579,7 @@ class TestCalculator(unittest.TestCase):
         rpn.execute("10 20 30.0")
         print("Result: ", str(rpn))
         self.assertEqual(str(rpn), "3: 10\n2: 20\n1: 30.0")
+
 
 if __name__ == '__main__':
     unittest.main()
