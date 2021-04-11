@@ -10,7 +10,7 @@
            static method:      none
            static attribute:   none
 
- ### private:
+ #### private:
            method:             __do_next_calculation() ->  gets the nextstring from thefunctionToExecutelist runs thecorrespondingmethod deletes theuses values fromthe stack andfunctionToExecuteBuild lists. Then appends the result to the stack list.
                                .__get_input_values(str)->  parses the str<string>, returns the next stack values and the next functionToExecute list.
 
