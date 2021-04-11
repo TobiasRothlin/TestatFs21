@@ -277,6 +277,7 @@ class RPNCalculator:
             if len(element) > 0:
                 clean_string = element.lower()
                 clean_string = clean_string.replace(',', '.')
+
                 if clean_string.count('.') > 0:
                     stack_list.append(float(clean_string))
                 elif clean_string.isdigit() or (
